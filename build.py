@@ -57,6 +57,9 @@ if __name__ == "__main__":
 
     logging.root.info("Configuring build")
     if args.target.startswith("android"):
+        # doesn't build correctly when LD=llvm-ld
+        del env["LD"]
+
         builder.execute(
             args,
             [
