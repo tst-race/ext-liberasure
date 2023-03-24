@@ -41,8 +41,7 @@ if __name__ == "__main__":
         "libtool=2.4.6*",
     ])
     if args.target.startswith("linux"):
-        arch = "arm64" if "arm" in args.target else "amd64"
-        builder.install_packages(args, [f"zlib1g-dev:{arch}=1:1.2.11*"])
+        builder.install_packages(args, [("zlib1g-dev", "1:1.2.11*", True)])
 
     builder.fetch_source(
         args=args,
