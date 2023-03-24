@@ -17,7 +17,7 @@
 #
 
 """
-Script to build liberasure for RACE
+Script to build liberasurecode for RACE
 """
 
 import logging
@@ -27,7 +27,7 @@ import race_ext_builder as builder
 
 def get_cli_arguments():
     """Parse command-line arguments to the script"""
-    parser = builder.get_arg_parser("liberasure", "1.6.2", 1, __file__)
+    parser = builder.get_arg_parser("liberasurecode", "1.6.2", 1, __file__)
     return builder.normalize_args(parser.parse_args())
 
 
