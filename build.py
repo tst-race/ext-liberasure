@@ -36,10 +36,13 @@ if __name__ == "__main__":
     builder.make_dirs(args)
     builder.setup_logger(args)
 
-    builder.install_packages(args, [
-        "automake=1:1.16.1*",
-        "libtool=2.4.6*",
-    ])
+    builder.install_packages(
+        args,
+        [
+            "automake=1:1.16.1*",
+            "libtool=2.4.6*",
+        ],
+    )
     if args.target.startswith("linux"):
         builder.install_packages(args, [("zlib1g-dev", "1:1.2.11*", True)])
 
@@ -54,59 +57,90 @@ if __name__ == "__main__":
 
     logging.root.info("Configuring build")
     if args.target.startswith("android"):
-        builder.execute(args, [
-            "autoreconf",
-            "--install",
-        ], cwd=source_dir, env=env)
+        builder.execute(
+            args,
+            [
+                "autoreconf",
+                "--install",
+            ],
+            cwd=source_dir,
+            env=env,
+        )
 
-        target = "x86_64-linux-android" if "x86" in args.target else "aarch64-linux-android"
-        builder.execute(args, [
-            "./configure",
-            "--prefix=/",
-            f"--host={target}",
-            f"--target={target}"
-        ], cwd=source_dir, env=env)
+        target = (
+            "x86_64-linux-android" if "x86" in args.target else "aarch64-linux-android"
+        )
+        builder.execute(
+            args,
+            ["./configure", "--prefix=/", f"--host={target}", f"--target={target}"],
+            cwd=source_dir,
+            env=env,
+        )
 
         logging.root.info("Manually removing link to pthread")
-        builder.find_and_replace(args,
-                                 root_dir=source_dir,
-                                 file_pattern="*Makefile*",
-                                 regex="\-lpthread",
-                                 replacement="")
+        builder.find_and_replace(
+            args,
+            root_dir=source_dir,
+            file_pattern="*Makefile*",
+            regex="\-lpthread",
+            replacement="",
+        )
 
     else:
-        builder.execute(args, [
-            "autoreconf",
-            "--install",
-        ], cwd=source_dir, env=env)
+        builder.execute(
+            args,
+            [
+                "autoreconf",
+                "--install",
+            ],
+            cwd=source_dir,
+            env=env,
+        )
 
         target = "x86_64-linux-gnu" if "x86" in args.target else "aarch64-linux-gnu"
-        builder.execute(args, [
-            "./configure",
-            "--prefix=/",
-            "--enable-werror=no",
-            "--disable-werror",
-            f"--host={target}",
-            f"--target={target}"
-        ], cwd=source_dir, env=env)
+        builder.execute(
+            args,
+            [
+                "./configure",
+                "--prefix=/",
+                "--enable-werror=no",
+                "--disable-werror",
+                f"--host={target}",
+                f"--target={target}",
+            ],
+            cwd=source_dir,
+            env=env,
+        )
 
         logging.root.info("Manually removing -Werror")
-        builder.find_and_replace(args,
-                                 root_dir=source_dir,
-                                 file_pattern="*Makefile*",
-                                 regex="\-Werror",
-                                 replacement="")
+        builder.find_and_replace(
+            args,
+            root_dir=source_dir,
+            file_pattern="*Makefile*",
+            regex="\-Werror",
+            replacement="",
+        )
 
     logging.root.info("Building")
-    builder.execute(args, [
-        "make",
-        "-j",
-        args.num_threads,
-    ], cwd=source_dir, env=env)
-    builder.execute(args, [
-        "make",
-        f"DESTDIR={args.install_dir}",
-        "install",
-    ], cwd=source_dir, env=env)
+    builder.execute(
+        args,
+        [
+            "make",
+            "-j",
+            args.num_threads,
+        ],
+        cwd=source_dir,
+        env=env,
+    )
+    builder.execute(
+        args,
+        [
+            "make",
+            f"DESTDIR={args.install_dir}",
+            "install",
+        ],
+        cwd=source_dir,
+        env=env,
+    )
 
     builder.create_package(args)
